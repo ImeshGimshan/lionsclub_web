@@ -57,6 +57,7 @@ type RawResult = {
     aboutPhotos?: SanityPhoto[];
     impactPeriod?: string;
     impactItems?: { value: number; label: string }[];
+    impactNote?: string;
     seoTitle?: string;
     seoDescription?: string;
     shareImage?: SanityPhoto;
@@ -238,7 +239,7 @@ export const getSiteData = cache(async (): Promise<SiteData> => {
     },
     heroPhoto: toPhoto(s.heroPhoto),
     aboutPhotos: photos(s.aboutPhotos),
-    impact: { period: s.impactPeriod, items: s.impactItems ?? [] },
+    impact: { period: s.impactPeriod, items: s.impactItems ?? [], note: s.impactNote?.trim() || undefined },
     records,
     albums: albums.map(({ id, title, category, description, photos }) => ({
       id,

@@ -16,7 +16,7 @@ query in `lib/sanity/queries.ts`, shaped by `lib/site-data.ts`.
 | --- | --- | --- |
 | Club | `clubName`, `district`, `multipleDistrict`, `locality`, `serviceYear` (`2026/27` format), `localWording` | Header, hero eyebrow, About, Officers year badge, motto card. The country shown in the header is the last part of `locality`. |
 | Contact | `secretaryName`, `secretaryRole`, `email`, `phoneDisplay`, `phoneInternational` (`+digits`), `facebook` | Contact card, call/email links, privacy notice |
-| Homepage | `heroPhoto` (required), `aboutPhotos` (max 2), `impactPeriod`, `impactItems` (max 3 × `{value, label}`) | Hero photo and caption, Our club photo band, impact tiles |
+| Homepage | `heroPhoto` (required), `aboutPhotos` (max 2), `impactPeriod`, `impactItems` (max 3 × `{value, label}`), `impactNote` (optional, ≤ 160) | Hero photo and caption, Our club photo band, impact tiles and the note under them (hidden when empty) |
 | Search & sharing | `seoTitle`, `seoDescription`, `shareImage` | `<title>`, meta description, Open Graph/Twitter image (falls back to the hero photo, cropped to 1200 × 630) |
 
 ### Homepage — `homepage` (id `homepage`)

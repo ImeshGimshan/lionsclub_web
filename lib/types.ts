@@ -29,6 +29,7 @@ export type Club = {
 export type Impact = {
   period?: string;
   items: { value: number; label: string }[];
+  note?: string;
 };
 
 export type ServiceRecord = {

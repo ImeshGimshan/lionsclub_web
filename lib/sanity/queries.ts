@@ -6,7 +6,7 @@ export const siteQuery = /* groq */ `{
     secretaryName, secretaryRole, email, phoneDisplay, phoneInternational, facebook,
     heroPhoto{${photoFields}},
     aboutPhotos[]{${photoFields}},
-    impactPeriod, impactItems[]{value, label},
+    impactPeriod, impactItems[]{value, label}, impactNote,
     seoTitle, seoDescription, shareImage{${photoFields}}
   },
   "home": *[_id == "homepage"][0]{

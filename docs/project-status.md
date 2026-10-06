@@ -19,7 +19,7 @@ Status key: **Done** · **Partly done** (see note) · **Club** (waiting on a clu
 | FR01 | Navigation | Done | Sticky header, unmodified emblem linking to top, focus-trapped mobile menu, skip link, headings clear the header after anchor jumps |
 | FR02 | Homepage message | Done | "Become a member" primary, "Explore our projects" secondary; installation group photo as hero (hotspot keeps the group in frame) |
 | FR03 | About the club | Done | Local identity, pillars, attributed mission and vision with official links |
-| FR04 | Impact highlights | Club | Three highlights with the July–September 2026 period. The "selected activities, not lifetime totals" note was removed at the developer's request; the club must accept this or it goes back (see D-extra below) |
+| FR04 | Impact highlights | Club | Three highlights with the July–September 2026 period. The "selected activities, not lifetime totals" note is an optional field (Club settings → Highlights note), currently empty; the club decides whether to fill it (see D-extra below) |
 | FR05 | Calls to action | Done | Membership, volunteering and support buttons all open the enquiry form; nothing implies registration or payment |
 | FR06 | External resources | Done | Facebook, Lion Portal, member resources, brand guidance; new tabs use `rel="noopener noreferrer"` and an "opens in new tab" label; no social feed |
 
@@ -27,7 +27,7 @@ Status key: **Done** · **Partly done** (see note) · **Club** (waiting on a clu
 
 | ID | Requirement | Status | Notes |
 | --- | --- | --- | --- |
-| FR07 | Project presentation | Partly done | Title, category, date, place, summary, results and image or illustration per record. The footnote was removed, as in FR04 |
+| FR07 | Project presentation | Partly done | Title, category, date, place, summary, results and image or illustration per record. The footnote under the timeline was removed; the optional highlights note (FR04) covers the figures |
 | FR08 | Accurate figures | Done | 250 and 50 saplings kept separate; no combined total; "eight clubs" shown as participating clubs |
 | FR09 | Photo attribution | Club | General captions in use; the elders home record shows its illustration. Needs D03 / D09 to map photos to events |
 
@@ -115,7 +115,7 @@ roles; drafts must be published by an Editor, so the club's review step is a pro
 | D08 | Languages | English only |
 | D09 | Photo permissions and context | General captions; `permissionConfirmed` is unticked until the club confirms |
 | D10 | Enquiries and measurement | **Proposed:** website enquiry form stored in Sanity (built); no analytics or WhatsApp. Club to approve the form, privacy wording and who checks enquiries |
-| D-extra | Impact footnote | Club to accept removal of the "selected projects only" notes from FR04 and FR07, or they are restored |
+| D-extra | Impact footnote | Club to decide whether to show the "selected projects only" note. It is an optional Studio field, empty by default, so they can add it themselves |
 
 ## Club inputs
 

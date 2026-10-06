@@ -115,6 +115,15 @@ export const siteSettings = defineType({
       validation: (r) => r.max(3),
     }),
     defineField({
+      name: 'impactNote',
+      title: 'Highlights note (optional)',
+      type: 'string',
+      group: 'home',
+      description:
+        'A short line under the highlights, for example "These figures describe selected projects only. They are not lifetime totals." Leave empty to hide it.',
+      validation: (r) => r.max(160),
+    }),
+    defineField({
       name: 'seoTitle',
       title: 'Page title',
       type: 'string',

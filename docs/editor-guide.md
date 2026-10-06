@@ -97,6 +97,9 @@ photos. **Gallery position** controls the order (lower numbers first; projects a
 **Club settings → Homepage tab → Highlights.** Up to three figures, plus the period they cover
 (e.g. "July–September 2026"). Only use verified figures.
 
+**Highlights note** (same tab, optional) adds a short line under the figures, for example "These
+figures describe selected projects only. They are not lifetime totals." Leave it empty to hide it.
+
 ### Change how the site looks in Google and when shared
 
 **Club settings → Search & sharing:** page title, description and the image shown when the link is

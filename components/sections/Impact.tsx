@@ -40,6 +40,7 @@ export async function Impact() {
             </li>
           ))}
         </ul>
+        {impact.note ? <p className="mt-5 max-w-prose text-sm text-muted">{impact.note}</p> : null}
       </div>
     </section>
   );
