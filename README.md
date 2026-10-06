@@ -65,7 +65,7 @@ lib/
   content.ts            Fixed content kept in code (Lions links, global causes, menu)
   enquiry.ts            Enquiry form fields and validation
 public/images/          Official Lions emblem only (all photos live in Sanity)
-studio/                 Sanity Studio: schemas, desk structure, seed script and original photos
+studio/                 Sanity Studio: schemas, desk structure and seed script (original photos are not committed)
 docs/                   Project documentation (below)
 ```
 
