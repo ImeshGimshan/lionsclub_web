@@ -1,0 +1,143 @@
+import {CogIcon} from '@sanity/icons/Cog'
+import {defineArrayMember, defineField, defineType} from 'sanity'
+
+/** Single document holding club identity, contact details and the homepage highlights. */
+export const siteSettings = defineType({
+  name: 'siteSettings',
+  title: 'Club settings',
+  type: 'document',
+  icon: CogIcon,
+  groups: [
+    {name: 'club', title: 'Club', default: true},
+    {name: 'contact', title: 'Contact'},
+    {name: 'home', title: 'Homepage'},
+    {name: 'seo', title: 'Search & sharing'},
+  ],
+  fields: [
+    defineField({name: 'clubName', title: 'Club name', type: 'string', group: 'club', validation: (r) => r.required()}),
+    defineField({name: 'district', title: 'District', type: 'string', group: 'club', validation: (r) => r.required()}),
+    defineField({name: 'multipleDistrict', title: 'Multiple district', type: 'string', group: 'club'}),
+    defineField({name: 'locality', title: 'Locality', type: 'string', group: 'club', validation: (r) => r.required()}),
+    defineField({
+      name: 'serviceYear',
+      title: 'Current service year',
+      type: 'string',
+      group: 'club',
+      description: 'Shown on the contact card and officers section. It is not rolled forward automatically.',
+      validation: (r) => r.required().regex(/^\d{4}\/\d{2}$/).error('Use the format 2026/27'),
+    }),
+    defineField({
+      name: 'localWording',
+      title: 'Club wording',
+      type: 'string',
+      group: 'club',
+      description: 'Local club wording, shown as the club’s own words (not an official Lions motto).',
+    }),
+
+    defineField({name: 'secretaryName', title: 'Public contact name', type: 'string', group: 'contact', validation: (r) => r.required()}),
+    defineField({name: 'secretaryRole', title: 'Public contact role', type: 'string', group: 'contact', initialValue: 'Secretary'}),
+    defineField({
+      name: 'email',
+      title: 'Club email',
+      type: 'string',
+      group: 'contact',
+      validation: (r) => r.required().email(),
+    }),
+    defineField({
+      name: 'phoneDisplay',
+      title: 'Telephone (as displayed)',
+      type: 'string',
+      group: 'contact',
+      placeholder: '+94 76 564 6292',
+      validation: (r) => r.required(),
+    }),
+    defineField({
+      name: 'phoneInternational',
+      title: 'Telephone (international, digits only)',
+      type: 'string',
+      group: 'contact',
+      description: 'Used for the call link, for example +94765646292.',
+      validation: (r) => r.required().regex(/^\+\d{8,15}$/).error('Use + followed by digits, no spaces'),
+    }),
+    defineField({
+      name: 'facebook',
+      title: 'Facebook page URL',
+      type: 'url',
+      group: 'contact',
+      validation: (r) => r.required().uri({scheme: ['https']}),
+    }),
+
+    defineField({
+      name: 'heroPhoto',
+      title: 'Hero photo',
+      type: 'photo',
+      group: 'home',
+      description: 'Shown uncropped at the top of the homepage. Use a real club photo with the whole group in frame.',
+      validation: (r) => r.required(),
+    }),
+    defineField({
+      name: 'aboutPhotos',
+      title: '"Our club" photos',
+      type: 'array',
+      group: 'home',
+      of: [defineArrayMember({type: 'photo'})],
+      options: {layout: 'grid'},
+      description: 'Two photos shown side by side in the "Our club" section.',
+      validation: (r) => r.max(2),
+    }),
+    defineField({
+      name: 'impactPeriod',
+      title: 'Highlights period',
+      type: 'string',
+      group: 'home',
+      placeholder: 'July–September 2026',
+    }),
+    defineField({
+      name: 'impactItems',
+      title: 'Highlights',
+      type: 'array',
+      group: 'home',
+      description: 'Up to three verified figures from selected projects.',
+      of: [
+        defineArrayMember({
+          type: 'object',
+          name: 'highlight',
+          fields: [
+            defineField({name: 'value', title: 'Value', type: 'number', validation: (r) => r.required().min(0)}),
+            defineField({name: 'label', title: 'Label', type: 'string', validation: (r) => r.required()}),
+          ],
+          preview: {
+            select: {value: 'value', label: 'label'},
+            prepare: ({value, label}) => ({title: `${value} ${label}`}),
+          },
+        }),
+      ],
+      validation: (r) => r.max(3),
+    }),
+    defineField({
+      name: 'seoTitle',
+      title: 'Page title',
+      type: 'string',
+      group: 'seo',
+      description: 'Shown in browser tabs and Google results. Aim for under 60 characters.',
+      validation: (r) => r.required().max(70),
+    }),
+    defineField({
+      name: 'seoDescription',
+      title: 'Description',
+      type: 'text',
+      rows: 3,
+      group: 'seo',
+      description: 'Shown under the title in Google results. Aim for 120–160 characters, without unsupported claims.',
+      validation: (r) => r.required().max(200),
+    }),
+    defineField({
+      name: 'shareImage',
+      title: 'Sharing image',
+      type: 'photo',
+      group: 'seo',
+      description: 'Shown when the site is shared on Facebook or WhatsApp (cropped to 1200 × 630). Defaults to the hero photo.',
+    }),
+  ],
+  preview: {prepare: () => ({title: 'Club settings'})},
+})
