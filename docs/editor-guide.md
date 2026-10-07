@@ -3,7 +3,7 @@
 This guide is for club members who keep the website up to date. You do not need any technical
 knowledge. Everything is done in the **Sanity Studio**, a website for editing content.
 
-- **Studio address:** given to you by the website developer (it looks like `https://<name>.sanity.studio`)
+- **Studio address:** <https://lions-dummalasuriya.sanity.studio>
 - **Signing in:** use the Google account or email address you were invited with. Never share a login.
 
 Changes appear on the public website within a few seconds of pressing **Publish**.

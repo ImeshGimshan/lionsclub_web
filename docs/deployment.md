@@ -67,7 +67,7 @@ Without this, the site still works but refreshes only once a minute instead of w
 
 ```bash
 cd studio
-npm run deploy        # choose a hostname, e.g. dummalasuriya-lions → https://dummalasuriya-lions.sanity.studio
+npm run deploy        # live at https://lions-dummalasuriya.sanity.studio (hostname chosen on first deploy)
 ```
 
 Then invite editors at **sanity.io/manage → project → Members**. Give each person their own login.

@@ -37,7 +37,7 @@ any local content setup. Only the enquiry form needs the token in `.env.local`.
 | root | `npm run lint` | ESLint |
 | root | `npx tsc --noEmit` | Type-check |
 | `studio/` | `npm run dev` | Sanity Studio locally |
-| `studio/` | `npm run deploy` | Publish the Studio to `<name>.sanity.studio` |
+| `studio/` | `npm run deploy` | Publish the Studio to <https://lions-dummalasuriya.sanity.studio> |
 | `studio/` | `npm run seed` | **Replaces** seeded documents with the initial content — see the warning in [docs/maintenance.md](docs/maintenance.md) |
 
 ## Environment variables

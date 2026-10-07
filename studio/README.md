@@ -11,7 +11,7 @@ Content editing for the club website. Project `zhxlfgcp`, two workspaces:
 npm install
 npm run dev       # http://localhost:3333
 npm run build     # check the Studio builds
-npm run deploy    # publish to <hostname>.sanity.studio
+npm run deploy    # publish to https://lions-dummalasuriya.sanity.studio
 ```
 
 | Path | Purpose |
