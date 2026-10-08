@@ -7,6 +7,10 @@
 // vercel.app addresses serve the same page and point search engines here.
 export const siteUrl = "https://lionsclubofdummalasuriya.org";
 
+// Launch switch. While false, every page carries "noindex" and the sitemap is not advertised, so
+// search engines leave the site alone during the club's review. Set to true at launch.
+export const searchIndexing = false;
+
 export const mailto = (email: string, subject: string) => `mailto:${email}?subject=${encodeURIComponent(subject)}`;
 
 export const lionsLinks = {
