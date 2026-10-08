@@ -58,7 +58,6 @@ function AlbumCard({
       whileFocus="hover"
       onClick={(e) => onOpen(e.currentTarget)}
       onFocus={(e) => onFocus(e.currentTarget)}
-      aria-label={`Open album: ${album.title}, ${count} ${count === 1 ? "photo" : "photos"}`}
       className="group block w-full text-left lg:w-[min(340px,28vw,calc((100svh-470px)*0.75))] lg:min-w-[240px] lg:shrink-0"
     >
       <div className="relative aspect-[4/5] w-full">

@@ -15,12 +15,14 @@ export function Marquee({ words, tone = "navy" }: { words: string[]; tone?: "nav
     () => {
       const mm = gsap.matchMedia();
       mm.add(MOTION_OK, () => {
-        const loop = gsap.to(track.current, { xPercent: -50, duration: 40, ease: "none", repeat: -1 });
+        const loop = gsap.to(track.current, { xPercent: -50, duration: 40, ease: "none", repeat: -1, paused: true });
         let direction = 1;
-        ScrollTrigger.create({
+        const st = ScrollTrigger.create({
           trigger: root.current,
           start: "top bottom",
           end: "bottom top",
+          // Only animate while the ribbon is on screen, so it costs nothing elsewhere on the page.
+          onToggle: (self) => (self.isActive ? loop.play() : loop.pause()),
           onUpdate: (self) => {
             if (self.direction !== direction) direction = self.direction;
             const boost = gsap.utils.clamp(1, 6, 1 + Math.abs(self.getVelocity()) / 400);
@@ -28,6 +30,7 @@ export function Marquee({ words, tone = "navy" }: { words: string[]; tone?: "nav
             gsap.to(loop, { timeScale: direction, duration: 1.2, delay: 0.25, overwrite: false });
           },
         });
+        if (st.isActive) loop.play();
       });
       return () => mm.revert();
     },

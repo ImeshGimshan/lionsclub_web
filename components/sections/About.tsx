@@ -50,7 +50,7 @@ export async function About() {
                   key={pillar.title}
                   className="group relative bg-white p-7 transition-colors duration-500 hover:bg-paper"
                 >
-                  <span className="font-serif text-2xl text-lions-yellow italic">{String(i + 1).padStart(2, "0")}</span>
+                  <span className="font-serif text-2xl text-lions-blue italic">{String(i + 1).padStart(2, "0")}</span>
                   <h3 className="mt-3 text-xl font-bold text-navy">{pillar.title}</h3>
                   <p className="mt-2 text-muted">{pillar.body}</p>
                   <span

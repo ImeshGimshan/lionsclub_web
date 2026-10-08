@@ -85,7 +85,9 @@ export function Choreographer() {
       });
 
       gsap.utils.toArray<HTMLElement>("[data-scrub-words]").forEach((el) => {
-        const split = SplitText.create(el, { type: "words" });
+        // aria "hidden": screen readers get one hidden copy of the sentence instead of an
+        // aria-label on the <p>, which is not allowed on paragraphs.
+        const split = SplitText.create(el, { type: "words", aria: "hidden" });
         gsap.fromTo(
           split.words,
           { opacity: 0.16 },

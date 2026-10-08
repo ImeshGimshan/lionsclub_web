@@ -298,6 +298,8 @@ body {
 }
 .sunburst {
   animation: spin-slow 160s linear infinite;
+  /* Own compositor layer: the rays turn without repainting the SVG every frame. */
+  will-change: transform;
 }
 
 @media (prefers-reduced-motion: reduce) {
