@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Libre_Bodoni, Roboto } from "next/font/google";
 import { Providers } from "@/components/motion/Providers";
+import { siteUrl } from "@/lib/content";
 import { getSiteData } from "@/lib/site-data";
 import "./globals.css";
 
@@ -24,10 +25,12 @@ export async function generateMetadata(): Promise<Metadata> {
   const { seo, club } = await getSiteData();
   const images = seo.image ? [{ url: seo.image, width: 1200, height: 630, alt: club.name }] : undefined;
   return {
+    metadataBase: new URL(siteUrl),
+    alternates: { canonical: "/" },
     title: seo.title,
     description: seo.description,
     icons: { icon: "/images/lions-emblem.png" },
-    openGraph: { type: "website", siteName: club.name, title: seo.title, description: seo.description, images },
+    openGraph: { type: "website", url: "/", siteName: club.name, title: seo.title, description: seo.description, images },
     twitter: { card: "summary_large_image", title: seo.title, description: seo.description, images: seo.image },
     // Prototype: keep out of search results until launch (SEO02).
     robots: { index: false, follow: false },

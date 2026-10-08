@@ -3,6 +3,10 @@
 // and the in-page navigation (tied to the section anchors). Everything else,
 // including homepage wording, comes from Sanity via lib/site-data.ts.
 
+// The site's official address: used for the canonical URL and link previews. The www and
+// vercel.app addresses serve the same page and point search engines here.
+export const siteUrl = "https://lionsclubofdummalasuriya.org";
+
 export const mailto = (email: string, subject: string) => `mailto:${email}?subject=${encodeURIComponent(subject)}`;
 
 export const lionsLinks = {
