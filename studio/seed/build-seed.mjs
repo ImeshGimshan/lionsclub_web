@@ -44,6 +44,7 @@ docs.push({
   email: 'lionsclubofdummalasuriya@gmail.com',
   phoneDisplay: '+94 76 564 6292',
   phoneInternational: '+94765646292',
+  whatsappNumber: '+94765646292',
   facebook: 'https://www.facebook.com/LionsClubDummalasuriya',
   heroPhoto: photo(
     'installation-01',
@@ -124,7 +125,7 @@ docs.push({
     'You do not need to have all the answers. Let’s start with a conversation.',
   ),
   joinSteps: [
-    tb('step', 'Introduce yourself', 'Send the short form below, or call or email our secretary. There is no commitment at this stage.'),
+    tb('step', 'Introduce yourself', 'Send a WhatsApp message using the form below, or call our secretary. There is no commitment at this stage.'),
     tb(
       'step',
       'Visit a meeting or activity',
@@ -139,8 +140,8 @@ docs.push({
   enquiryEyebrow: 'Membership, meetings & more',
   enquiryHeading: 'Tell us you’re interested.',
   enquiryIntro:
-    'Thinking of joining, want to visit a meeting, or keen to help with a project? Send a short message and the secretary will get back to you with the confirmed date, time, venue and anything else you need.',
-  enquiryPoints: ['A reply by email or phone, as you prefer', 'No commitment at this stage', 'Your details stay private'],
+    'Thinking of joining, want to visit a meeting, or keen to help with a project? Send a short WhatsApp message and the secretary will get back to you with the confirmed date, time, venue and anything else you need.',
+  enquiryPoints: ['A reply on WhatsApp from the secretary', 'No commitment at this stage', 'Nothing is stored on this website'],
   volunteerTitle: 'Not ready to join? Volunteer.',
   volunteerBody:
     'You can ask about helping with an individual activity. We will confirm whether it is suitable and available before you take part. Volunteering is separate from applying for membership.',
@@ -159,8 +160,8 @@ docs.push({
       'Ask the secretary about current club dues, any joining fees, meetings and service commitments. We will explain the requirements before you decide. No payment is collected on this website.',
     ],
     [
-      'Does sending the form make me a member?',
-      'No. It lets the secretary know you are interested. They will reply by your preferred method, explain the club’s membership process and discuss the next steps with you.',
+      'Does sending a message make me a member?',
+      'No. It lets the secretary know you are interested. They will reply on WhatsApp, explain the club’s membership process and discuss the next steps with you.',
     ],
     [
       'Can I volunteer without becoming a member?',

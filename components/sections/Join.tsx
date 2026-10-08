@@ -49,9 +49,9 @@ export async function Join() {
         </div>
 
         {/* Enquiry card: also covers meeting visits (replaces the old Meetings section).
-            Submissions go to the private Sanity "enquiries" dataset. */}
+            Submitting opens WhatsApp with the message ready for the club's number. */}
         <div className="mt-16">
-          <EnquiryForm club={club} copy={home.enquiry} />
+          <EnquiryForm club={club} whatsapp={club.whatsapp} copy={home.enquiry} />
         </div>
 
         <div className="mt-24 grid gap-10 lg:grid-cols-[1fr_1.25fr] lg:gap-16">

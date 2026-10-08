@@ -52,6 +52,7 @@ type RawResult = {
     email: string;
     phoneDisplay: string;
     phoneInternational: string;
+    whatsappNumber?: string;
     facebook: string;
     heroPhoto?: SanityPhoto;
     aboutPhotos?: SanityPhoto[];
@@ -229,6 +230,7 @@ export const getSiteData = cache(async (): Promise<SiteData> => {
       email: s.email,
       phoneDisplay: s.phoneDisplay,
       phoneHref: `tel:${s.phoneInternational}`,
+      whatsapp: s.whatsappNumber,
       facebook: s.facebook,
     },
     home: toHomepage(raw.home),

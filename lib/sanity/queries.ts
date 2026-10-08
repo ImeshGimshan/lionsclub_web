@@ -3,7 +3,7 @@ const photoFields = `asset, crop, hotspot, alt, caption, "lqip": asset->metadata
 export const siteQuery = /* groq */ `{
   "settings": *[_id == "siteSettings"][0]{
     clubName, district, multipleDistrict, locality, serviceYear, localWording,
-    secretaryName, secretaryRole, email, phoneDisplay, phoneInternational, facebook,
+    secretaryName, secretaryRole, email, phoneDisplay, phoneInternational, whatsappNumber, facebook,
     heroPhoto{${photoFields}},
     aboutPhotos[]{${photoFields}},
     impactPeriod, impactItems[]{value, label}, impactNote,

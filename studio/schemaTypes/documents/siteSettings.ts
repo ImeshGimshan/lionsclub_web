@@ -60,6 +60,15 @@ export const siteSettings = defineType({
       validation: (r) => r.required().regex(/^\+\d{8,15}$/).error('Use + followed by digits, no spaces'),
     }),
     defineField({
+      name: 'whatsappNumber',
+      title: 'WhatsApp number for enquiries (international, digits only)',
+      type: 'string',
+      group: 'contact',
+      description:
+        'The enquiry form opens a WhatsApp chat with this number, for example +94765646292. Usually the secretary. Update it when the secretary changes.',
+      validation: (r) => r.required().regex(/^\+\d{8,15}$/).error('Use + followed by digits, no spaces'),
+    }),
+    defineField({
       name: 'facebook',
       title: 'Facebook page URL',
       type: 'url',

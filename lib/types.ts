@@ -23,6 +23,8 @@ export type Club = {
   email: string;
   phoneDisplay: string;
   phoneHref: string;
+  /** International number the enquiry form messages on WhatsApp, e.g. "+94765646292". */
+  whatsapp?: string;
   facebook: string;
 };
 

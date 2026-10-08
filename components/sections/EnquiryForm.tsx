@@ -6,22 +6,22 @@ import {
   ArrowRight,
   Check,
   CheckCircle2,
-  Loader2,
-  Mail,
+  MessageCircle,
   MessageSquareText,
   Phone,
   ShieldCheck,
 } from "lucide-react";
-import { useActionState, useEffect, useId, useRef, useState, type ReactNode } from "react";
-import { submitEnquiry } from "@/app/enquiry-actions";
+import { useCallback, useEffect, useId, useRef, useState, type FormEvent, type ReactNode } from "react";
 import {
   ENQUIRY_CATEGORIES,
   MESSAGE_MAX,
-  RETENTION_MONTHS,
+  enquiryMessage,
+  isCategory,
+  validateEnquiry,
+  whatsappUrl,
   type EnquiryCategory,
   type EnquiryField,
-  type EnquiryState,
-  type ReplyMethod,
+  type FieldErrors,
 } from "@/lib/enquiry";
 import { ScrollTrigger } from "@/lib/gsap";
 import type { Club, Homepage } from "@/lib/types";
@@ -38,7 +38,7 @@ const placeholders: Record<EnquiryCategory, string> = {
   other: "How can we help?",
 };
 
-const fieldOrder: EnquiryField[] = ["category", "name", "replyMethod", "email", "phone", "area", "message", "consent"];
+const fieldOrder: EnquiryField[] = ["name", "area", "message"];
 
 // White inputs on Lions blue, with a yellow focus ring to match the card's buttons.
 const inputClass = (invalid: boolean) =>
@@ -77,15 +77,25 @@ function Label({ htmlFor, children, optional }: { htmlFor: string; children: Rea
   );
 }
 
-type ClubContact = Pick<Club, "email" | "phoneDisplay" | "phoneHref">;
+type ClubContact = Pick<Club, "name" | "phoneDisplay" | "phoneHref">;
 
 /**
  * Website enquiry form (requirements Section 08, optional form), styled as the
  * Lions-blue "come and meet the club" card. It also covers meeting visits, so the
- * `#events` anchor lands here. Submissions are stored in the private Sanity
- * "enquiries" dataset. Buttons elsewhere preselect a topic with `data-enquiry="..."`.
+ * `#events` anchor lands here. Submitting opens WhatsApp with the message ready to
+ * send to the club's number; the website itself receives and stores nothing.
+ * Buttons elsewhere preselect a topic with `data-enquiry="..."`.
  */
-export function EnquiryForm({ club, copy }: { club: ClubContact; copy: Homepage["enquiry"] }) {
+export function EnquiryForm({
+  club,
+  whatsapp,
+  copy,
+}: {
+  club: ClubContact;
+  /** International WhatsApp number. Without it the form is not shown. */
+  whatsapp?: string;
+  copy: Homepage["enquiry"];
+}) {
   const [category, setCategory] = useState<EnquiryCategory>("membership");
   // Bumping the key remounts the panel, which resets the form and the action state.
   const [formKey, setFormKey] = useState(0);
@@ -97,7 +107,7 @@ export function EnquiryForm({ club, copy }: { club: ClubContact; copy: Homepage[
     const onClick = (event: MouseEvent) => {
       const trigger = (event.target as Element).closest<HTMLElement>("[data-enquiry]");
       const value = trigger?.dataset.enquiry;
-      if (value && ENQUIRY_CATEGORIES.some((c) => c.value === value)) setCategory(value as EnquiryCategory);
+      if (value && isCategory(value)) setCategory(value);
     };
     document.addEventListener("click", onClick);
     return () => document.removeEventListener("click", onClick);
@@ -149,13 +159,16 @@ export function EnquiryForm({ club, copy }: { club: ClubContact; copy: Homepage[
           </a>
         </div>
 
-        <EnquiryPanel
-          key={formKey}
-          club={club}
-          category={category}
-          setCategory={setCategory}
-          onReset={() => setFormKey((k) => k + 1)}
-        />
+        {whatsapp ? (
+          <EnquiryPanel
+            key={formKey}
+            club={club}
+            whatsapp={whatsapp}
+            category={category}
+            setCategory={setCategory}
+            onReset={() => setFormKey((k) => k + 1)}
+          />
+        ) : null}
       </div>
     </div>
   );
@@ -163,47 +176,60 @@ export function EnquiryForm({ club, copy }: { club: ClubContact; copy: Homepage[
 
 function EnquiryPanel({
   club,
+  whatsapp,
   category,
   setCategory,
   onReset,
 }: {
   club: ClubContact;
+  whatsapp: string;
   category: EnquiryCategory;
   setCategory: (c: EnquiryCategory) => void;
   onReset: () => void;
 }) {
-  const [state, action, pending] = useActionState<EnquiryState, FormData>(submitEnquiry, { status: "idle" });
-  const [replyMethod, setReplyMethod] = useState<ReplyMethod>("email");
-  const [startedAt, setStartedAt] = useState(0);
+  const [errors, setErrors] = useState<FieldErrors>({});
+  // Bumped on every failed attempt so the error summary takes focus again.
+  const [attempt, setAttempt] = useState(0);
+  const [sent, setSent] = useState<{ name: string; url: string } | null>(null);
   const summaryRef = useRef<HTMLDivElement>(null);
-  const successRef = useRef<HTMLHeadingElement>(null);
+  // The confirmation mounts only after the form's exit animation, so focus it as it appears.
+  const focusOnMount = useCallback((el: HTMLHeadingElement | null) => el?.focus(), []);
   const uid = useId();
   const id = (field: string) => `${uid}-${field}`;
-
-  const errors = state.status === "error" ? state.fieldErrors : {};
-  const values = state.status === "error" ? state.values : undefined;
   const errorList = fieldOrder.filter((f) => errors[f]);
 
-  // Time the visit (spam check) only after mount, so it reflects a real person filling it in.
+  // Move focus to the error summary so screen readers announce the problems.
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- Date.now() must run on the client
-    setStartedAt(Date.now());
-  }, []);
-
-  // Move focus to the error summary or the confirmation so screen readers announce the result.
+    if (attempt) summaryRef.current?.focus();
+  }, [attempt]);
   useEffect(() => {
-    if (state.status === "error") summaryRef.current?.focus();
-    if (state.status === "success") successRef.current?.focus();
     // The card's height changed; re-measure scroll animations further down the page.
     const t = setTimeout(() => ScrollTrigger.refresh(), 450);
     return () => clearTimeout(t);
-  }, [state]);
+  }, [sent]);
+
+  const onSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const form = new FormData(event.currentTarget);
+    const text = (key: string) => String(form.get(key) ?? "").trim();
+    const values = { category, name: text("name"), area: text("area"), message: text("message") };
+    const found = validateEnquiry(values);
+    setErrors(found);
+    if (Object.keys(found).length) {
+      setAttempt((n) => n + 1);
+      return;
+    }
+    const url = whatsappUrl(whatsapp, enquiryMessage(values, club.name));
+    // Opened from the submit event, so browsers treat it as user-initiated rather than a pop-up.
+    window.open(url, "_blank", "noopener,noreferrer");
+    setSent({ name: values.name, url });
+  };
 
   const describedBy = (field: EnquiryField) => (errors[field] ? id(`${field}-error`) : undefined);
 
   return (
     <AnimatePresence mode="wait" initial={false}>
-      {state.status === "success" ? (
+      {sent ? (
         <motion.div
           key="success"
           initial={{ opacity: 0, y: 24 }}
@@ -218,21 +244,28 @@ function EnquiryPanel({
           >
             <CheckCircle2 className="size-10" aria-hidden="true" />
           </motion.span>
-          <h3 ref={successRef} tabIndex={-1} className="mt-6 text-3xl font-extrabold tracking-[-0.02em] outline-none">
-            Thank you{state.name ? `, ${state.name.split(" ")[0]}` : ""}.
+          <h3 ref={focusOnMount} tabIndex={-1} className="mt-6 text-3xl font-extrabold tracking-[-0.02em] outline-none">
+            Almost there, {sent.name.split(" ")[0]}.
           </h3>
           <p className="mt-3 max-w-md text-lg text-white/85" role="status">
-            We’ve received your enquiry. The secretary will get back to you by{" "}
-            {state.replyMethod === "phone" ? "phone" : "email"}.
+            Your message is ready in WhatsApp. Press <strong className="text-white">Send</strong> there and the
+            secretary will reply in the same chat.
           </p>
-          <button type="button" onClick={onReset} className="btn btn-ghost-light mt-8">
-            Send another enquiry
-          </button>
+          <div className="mt-8 flex flex-wrap justify-center gap-3">
+            <a href={sent.url} target="_blank" rel="noopener noreferrer" className="btn btn-yellow">
+              <MessageCircle className="size-5" aria-hidden="true" />
+              WhatsApp didn’t open? Try again
+              <span className="sr-only"> (opens WhatsApp)</span>
+            </a>
+            <button type="button" onClick={onReset} className="btn btn-ghost-light">
+              Write another message
+            </button>
+          </div>
         </motion.div>
       ) : (
         <motion.form
           key="form"
-          action={action}
+          onSubmit={onSubmit}
           noValidate
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -242,7 +275,7 @@ function EnquiryPanel({
           <p className="text-sm text-white/70">All fields are required unless marked optional.</p>
 
           <AnimatePresence>
-            {state.status === "error" && (errorList.length > 0 || state.formError) ? (
+            {errorList.length ? (
               <motion.div
                 ref={summaryRef}
                 tabIndex={-1}
@@ -253,28 +286,26 @@ function EnquiryPanel({
                 className="mt-4 overflow-hidden rounded-2xl bg-white outline-none"
               >
                 <div className="border-l-[6px] border-[#b42318] p-5">
-                  <p className="font-bold text-[#7a271a]">{state.formError ?? "Please check the following:"}</p>
-                  {errorList.length ? (
-                    <ul className="mt-2 list-disc space-y-1 pl-5 text-[#7a271a]">
-                      {errorList.map((field) => (
-                        <li key={field}>
-                          <a className="underline underline-offset-2" href={`#${id(field)}`}>
-                            {errors[field]}
-                          </a>
-                        </li>
-                      ))}
-                    </ul>
-                  ) : null}
+                  <p className="font-bold text-[#7a271a]">Please check the following:</p>
+                  <ul className="mt-2 list-disc space-y-1 pl-5 text-[#7a271a]">
+                    {errorList.map((field) => (
+                      <li key={field}>
+                        <a className="underline underline-offset-2" href={`#${id(field)}`}>
+                          {errors[field]}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               </motion.div>
             ) : null}
           </AnimatePresence>
 
           {/* Topic: radio buttons styled as pills, with a sliding yellow highlight. */}
-          <fieldset className="mt-6" aria-describedby={describedBy("category")}>
+          <fieldset className="mt-6">
             <legend className="font-semibold text-white">What is your enquiry about?</legend>
             <div className="mt-3 flex flex-wrap gap-2">
-              {ENQUIRY_CATEGORIES.map((option, i) => {
+              {ENQUIRY_CATEGORIES.map((option) => {
                 const checked = category === option.value;
                 return (
                   <label
@@ -291,7 +322,6 @@ function EnquiryPanel({
                       />
                     ) : null}
                     <input
-                      id={i === 0 ? id("category") : undefined}
                       type="radio"
                       name="category"
                       value={option.value}
@@ -304,106 +334,21 @@ function EnquiryPanel({
                 );
               })}
             </div>
-            <FieldError id={id("category-error")} message={errors.category} />
           </fieldset>
 
           <div className="mt-6 grid gap-6 sm:grid-cols-2">
-            <div className="sm:col-span-2">
+            <div>
               <Label htmlFor={id("name")}>Your name</Label>
               <input
                 id={id("name")}
                 name="name"
                 autoComplete="name"
-                defaultValue={values?.name}
                 aria-invalid={Boolean(errors.name)}
                 aria-describedby={describedBy("name")}
                 className={inputClass(Boolean(errors.name))}
               />
               <FieldError id={id("name-error")} message={errors.name} />
             </div>
-
-            <fieldset className="sm:col-span-2" aria-describedby={describedBy("replyMethod")}>
-              <legend className="font-semibold text-white">How should we reply?</legend>
-              <div className="mt-3 grid grid-cols-2 gap-2 sm:max-w-sm">
-                {(
-                  [
-                    { value: "email", label: "Email", Icon: Mail },
-                    { value: "phone", label: "Phone", Icon: Phone },
-                  ] as const
-                ).map(({ value, label, Icon }, i) => (
-                  <label
-                    key={value}
-                    className={`flex cursor-pointer items-center justify-center gap-2 rounded-xl border-2 px-4 py-3 font-semibold transition-colors ${pillFocus} ${
-                      replyMethod === value
-                        ? "border-white bg-white text-lions-blue"
-                        : "border-white/30 text-white hover:border-white/60"
-                    }`}
-                  >
-                    <input
-                      id={i === 0 ? id("replyMethod") : undefined}
-                      type="radio"
-                      name="replyMethod"
-                      value={value}
-                      checked={replyMethod === value}
-                      onChange={() => setReplyMethod(value)}
-                      className="sr-only"
-                    />
-                    <Icon className="size-4" aria-hidden="true" />
-                    {label}
-                  </label>
-                ))}
-              </div>
-              <FieldError id={id("replyMethod-error")} message={errors.replyMethod} />
-            </fieldset>
-
-            <AnimatePresence mode="wait" initial={false}>
-              {replyMethod === "email" ? (
-                <motion.div
-                  key="email"
-                  initial={{ opacity: 0, x: -12 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 12 }}
-                  transition={{ duration: 0.25 }}
-                >
-                  <Label htmlFor={id("email")}>Email address</Label>
-                  <input
-                    id={id("email")}
-                    name="email"
-                    type="email"
-                    inputMode="email"
-                    autoComplete="email"
-                    spellCheck={false}
-                    defaultValue={values?.email}
-                    aria-invalid={Boolean(errors.email)}
-                    aria-describedby={describedBy("email")}
-                    className={inputClass(Boolean(errors.email))}
-                  />
-                  <FieldError id={id("email-error")} message={errors.email} />
-                </motion.div>
-              ) : (
-                <motion.div
-                  key="phone"
-                  initial={{ opacity: 0, x: -12 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 12 }}
-                  transition={{ duration: 0.25 }}
-                >
-                  <Label htmlFor={id("phone")}>Phone number</Label>
-                  <input
-                    id={id("phone")}
-                    name="phone"
-                    type="tel"
-                    inputMode="tel"
-                    autoComplete="tel"
-                    defaultValue={values?.phone}
-                    aria-invalid={Boolean(errors.phone)}
-                    aria-describedby={describedBy("phone")}
-                    className={inputClass(Boolean(errors.phone))}
-                  />
-                  <FieldError id={id("phone-error")} message={errors.phone} />
-                </motion.div>
-              )}
-            </AnimatePresence>
 
             <div>
               <Label htmlFor={id("area")} optional>
@@ -414,7 +359,6 @@ function EnquiryPanel({
                 name="area"
                 autoComplete="address-level2"
                 placeholder="e.g. Dummalasuriya"
-                defaultValue={values?.area}
                 aria-invalid={Boolean(errors.area)}
                 aria-describedby={describedBy("area")}
                 className={inputClass(Boolean(errors.area))}
@@ -432,7 +376,6 @@ function EnquiryPanel({
                 rows={4}
                 maxLength={MESSAGE_MAX}
                 placeholder={placeholders[category]}
-                defaultValue={values?.message}
                 aria-invalid={Boolean(errors.message)}
                 aria-describedby={describedBy("message")}
                 className={`${inputClass(Boolean(errors.message))} resize-y`}
@@ -445,7 +388,7 @@ function EnquiryPanel({
           <details className="group mt-6 rounded-2xl bg-white/8 p-5 text-sm text-white/80 ring-1 ring-white/15">
             <summary className="flex cursor-pointer list-none items-center gap-2 font-semibold text-white">
               <ShieldCheck className="size-5 text-lions-yellow" aria-hidden="true" />
-              How we use your details
+              How your message is sent
               <span
                 className="ml-auto text-lg text-lions-yellow transition-transform group-open:rotate-45"
                 aria-hidden="true"
@@ -455,23 +398,15 @@ function EnquiryPanel({
             </summary>
             <div className="mt-3 space-y-2 leading-relaxed">
               <p>
-                Your enquiry is stored in the club’s private content system, hosted by Sanity.io. Only club officers who
-                handle enquiries can see it.
+                The button opens WhatsApp with your message ready. Nothing is sent until you press Send in WhatsApp, and
+                this website does not receive or store anything you type here.
               </p>
               <p>
-                We use your details only to reply to this enquiry. We do not use them for marketing or share them with
-                anyone else.
+                Once you send it, the club secretary sees your name, message and WhatsApp number, and uses them only to
+                reply to you. WhatsApp is a service run by Meta.
               </p>
               <p>
-                Enquiries are deleted {RETENTION_MONTHS} months after we receive them. To see, correct or remove your
-                details sooner, contact the secretary at{" "}
-                <a
-                  className="font-semibold text-lions-yellow underline underline-offset-2"
-                  href={`mailto:${club.email}`}
-                >
-                  {club.email}
-                </a>{" "}
-                or{" "}
+                To have your messages deleted, ask the secretary in the same chat or call{" "}
                 <a className="font-semibold text-lions-yellow underline underline-offset-2" href={club.phoneHref}>
                   {club.phoneDisplay}
                 </a>
@@ -480,47 +415,11 @@ function EnquiryPanel({
             </div>
           </details>
 
-          <div className="mt-5">
-            <label className="flex cursor-pointer items-start gap-3 text-white">
-              <input
-                id={id("consent")}
-                type="checkbox"
-                name="consent"
-                defaultChecked={values?.consent}
-                aria-invalid={Boolean(errors.consent)}
-                aria-describedby={describedBy("consent")}
-                className="mt-0.5 size-5 shrink-0 cursor-pointer accent-lions-yellow"
-              />
-              <span>I have read how my details will be used.</span>
-            </label>
-            <FieldError id={id("consent-error")} message={errors.consent} />
-          </div>
-
-          {/* Spam traps: hidden from people and assistive tech. */}
-          <div aria-hidden="true" className="absolute -left-[9999px] h-px w-px overflow-hidden">
-            <label>
-              Leave this empty
-              <input type="text" name="website" tabIndex={-1} autoComplete="off" />
-            </label>
-          </div>
-          <input type="hidden" name="startedAt" value={startedAt} />
-
-          <button
-            type="submit"
-            disabled={pending}
-            className="btn btn-yellow mt-8 w-full disabled:cursor-wait disabled:opacity-80 sm:w-auto sm:min-w-56"
-          >
-            {pending ? (
-              <>
-                <Loader2 className="size-5 animate-spin" aria-hidden="true" />
-                Sending…
-              </>
-            ) : (
-              <>
-                Send enquiry
-                <ArrowRight className="size-5" aria-hidden="true" />
-              </>
-            )}
+          <button type="submit" className="btn btn-yellow mt-8 w-full sm:w-auto sm:min-w-56">
+            <MessageCircle className="size-5" aria-hidden="true" />
+            Continue in WhatsApp
+            <ArrowRight className="size-5" aria-hidden="true" />
+            <span className="sr-only"> (opens WhatsApp)</span>
           </button>
         </motion.form>
       )}
