@@ -80,10 +80,11 @@ roles, so every editor is an Administrator and the club's review step is a proce
 | --- | --- | --- | --- |
 | SEO01 | Metadata | Done | Title and description editable in Club settings → Search & sharing |
 | SEO02 | Discoverability | Ready | Canonical URLs, `robots.txt` and `sitemap.xml` (home and privacy) in place. At launch set `searchIndexing = true` in `lib/content.ts`, which removes `noindex` and advertises the sitemap |
-| SEO03 | Sharing | Partly done | Open Graph and Twitter images from the hero photo (1200 × 630). Test on the final URL |
+| SEO03 | Sharing | Ready | Open Graph and Twitter images from the hero photo (1200 × 630, whole group in frame). Structured data (schema.org `NGO`) with only facts shown on the page. Test the preview on launch day ([launch-day.md](launch-day.md#4-check-how-the-link-looks-when-shared)) |
 | — | Analytics | Not commissioned | None installed (D10) |
 | — | Privacy notice | Club | `/privacy` written from what the site actually does (checked: no cookies or browser storage; the browser contacts only Vercel and Sanity's live API). Names Vercel, Sanity and WhatsApp. Linked from the footer and the form. Club to approve the wording |
 | — | Form security | Done | No server endpoint, storage or secrets: the form only builds a WhatsApp link, so there is nothing to attack or leak |
+| — | Security headers | Done | HTTPS with HSTS (Vercel), `nosniff`, `Referrer-Policy`, framing blocked (`X-Frame-Options` and `frame-ancestors`), `Permissions-Policy`. No full Content-Security-Policy: it would need per-request nonces, which would stop the page being cached |
 | — | Backups | Partly done | Procedure documented and tested manually; not yet scheduled |
 
 ### Acceptance tests (Section 14)

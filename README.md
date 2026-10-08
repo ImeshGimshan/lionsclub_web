@@ -79,6 +79,7 @@ docs/                   Project documentation (below)
 | [docs/enquiries.md](docs/enquiries.md) | Developers, club | Enquiry form: WhatsApp flow, validation, privacy |
 | [docs/deployment.md](docs/deployment.md) | Developers | Deploying to Vercel, Studio hosting, domains, go-live checklist |
 | [docs/maintenance.md](docs/maintenance.md) | Developers | Backups, tokens, updates, testing, troubleshooting |
+| [docs/launch-day.md](docs/launch-day.md) | Developer | Step-by-step for going public: search indexing, Google Search Console, share previews |
 | [docs/project-status.md](docs/project-status.md) | Everyone | Requirements coverage, open club decisions, remaining work |
 
 ## Brand rules in one line

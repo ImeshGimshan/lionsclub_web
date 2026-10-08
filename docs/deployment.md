@@ -104,6 +104,8 @@ nobody does:
 
 ## Go-live checklist
 
+The step-by-step version, with exact commands, is [launch-day.md](launch-day.md).
+
 - [ ] Club approvals received (see [project-status.md](project-status.md))
 - [ ] Club confirmed the WhatsApp number in Club settings; a test enquiry opens WhatsApp addressed to it
 - [ ] Production domain added to Sanity CORS; publishing a small change shows on the open site within seconds
