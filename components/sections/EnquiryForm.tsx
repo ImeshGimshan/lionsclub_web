@@ -410,6 +410,10 @@ function EnquiryPanel({
                 <a className="font-semibold text-lions-yellow underline underline-offset-2" href={club.phoneHref}>
                   {club.phoneDisplay}
                 </a>
+                . More in our{" "}
+                <a className="font-semibold text-lions-yellow underline underline-offset-2" href="/privacy">
+                  privacy notice
+                </a>
                 .
               </p>
             </div>

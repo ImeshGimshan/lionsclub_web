@@ -7,7 +7,11 @@ import { nav } from "@/lib/content";
 import { Emblem } from "@/components/ui/brand";
 import { useLenis } from "@/components/motion/SmoothScroll";
 
-export function Header({ clubName, tagline }: { clubName: string; tagline: string }) {
+/**
+ * `base` prefixes the in-page links: "" on the homepage, "/" on other pages so the links lead back
+ * to the homepage sections. Other pages also get a solid header, since they have no dark hero.
+ */
+export function Header({ clubName, tagline, base = "" }: { clubName: string; tagline: string; base?: "" | "/" }) {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const menuButton = useRef<HTMLButtonElement>(null);
@@ -68,25 +72,22 @@ export function Header({ clubName, tagline }: { clubName: string; tagline: strin
       <header
         data-site-header
         className={`fixed inset-x-0 top-0 z-50 transition-[background-color,box-shadow,backdrop-filter] duration-500 ${
-          scrolled || open
+          base || scrolled || open
             ? "bg-navy/92 shadow-[0_10px_40px_-12px_rgb(8_22_41/0.6)] backdrop-blur-md"
             : "bg-transparent"
         }`}
       >
         <div className="container-x flex h-[var(--header-h)] items-center justify-between gap-4">
-          <a
-            href="#home"
-            className="group flex min-w-0 items-center gap-3 text-white"
-            aria-label={`${clubName}, back to top`}
-          >
+          <a href={`${base}#home`} className="group flex min-w-0 items-center gap-3 text-white">
             <span className="grid size-12 shrink-0 place-items-center rounded-full bg-white p-1 shadow-md transition-transform duration-500 group-hover:rotate-[8deg]">
-              <Emblem size={40} preload />
+              <Emblem size={40} preload alt="" />
             </span>
             <span className="min-w-0 leading-tight">
               <span className="block truncate text-[0.95rem] font-bold sm:text-base">{clubName}</span>
               <span className="block text-[0.72rem] font-medium tracking-[0.14em] text-white/70 uppercase">
                 {tagline}
               </span>
+              <span className="sr-only">{base ? ", homepage" : ", back to top"}</span>
             </span>
           </a>
 
@@ -94,14 +95,14 @@ export function Header({ clubName, tagline }: { clubName: string; tagline: strin
             {nav.map((item) => (
               <a
                 key={item.href}
-                href={item.href}
+                href={base + item.href}
                 className="group relative rounded-full px-3.5 py-2 text-[0.95rem] font-medium text-white/85 transition-colors hover:text-white"
               >
                 {item.label}
                 <span className="absolute inset-x-3.5 bottom-1 h-0.5 origin-left scale-x-0 rounded bg-lions-yellow transition-transform duration-500 ease-[var(--ease-out-expo)] group-hover:scale-x-100" />
               </a>
             ))}
-            <a href="#support" className="btn btn-yellow ml-3 !min-h-11 !py-2 text-sm">
+            <a href={`${base}#support`} className="btn btn-yellow ml-3 !min-h-11 !py-2 text-sm">
               <HandHeart className="size-4" aria-hidden="true" />
               Support our work
             </a>
@@ -148,7 +149,7 @@ export function Header({ clubName, tagline }: { clubName: string; tagline: strin
               ].map((item, i) => (
                 <motion.a
                   key={item.href}
-                  href={item.href}
+                  href={base + item.href}
                   data-enquiry={"enquiry" in item ? item.enquiry : undefined}
                   onClick={() => close(false)}
                   className="flex items-center justify-between border-b border-white/10 py-4 text-2xl font-bold text-white"
@@ -161,7 +162,7 @@ export function Header({ clubName, tagline }: { clubName: string; tagline: strin
                 </motion.a>
               ))}
               <motion.a
-                href="#support"
+                href={`${base}#support`}
                 onClick={() => close(false)}
                 className="btn btn-yellow mt-8"
                 initial={{ opacity: 0, y: 24 }}

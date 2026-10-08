@@ -5,11 +5,22 @@ import { useId, type SVGProps } from "react";
  * The official Lions International emblem, untouched (BR01): never recoloured,
  * cropped or placed over a busy photo. It always sits on a plain surface.
  */
-export function Emblem({ size = 48, className = "", preload = false }: { size?: number; className?: string; preload?: boolean }) {
+/** Pass `alt=""` where the emblem sits next to text that already names the club. */
+export function Emblem({
+  size = 48,
+  className = "",
+  preload = false,
+  alt = "Lions International emblem",
+}: {
+  size?: number;
+  className?: string;
+  preload?: boolean;
+  alt?: string;
+}) {
   return (
     <Image
       src="/images/lions-emblem.png"
-      alt="Lions International emblem"
+      alt={alt}
       width={size}
       height={size}
       preload={preload}
@@ -34,17 +45,21 @@ export function Sunburst({ rays = 36, className = "", ...props }: SVGProps<SVGSV
     const y2 = 100 + Math.sin(a + w) * r;
     return `M100 100L${x1.toFixed(2)} ${y1.toFixed(2)}L${x2.toFixed(2)} ${y2.toFixed(2)}Z`;
   }).join("");
+  // The class (and the .sunburst spin) goes on a wrapping <div>: the GPU can rotate an HTML layer,
+  // whereas rotating the <svg> itself makes the browser re-lay-out and repaint it every frame.
   return (
-    <svg viewBox="0 0 200 200" aria-hidden="true" focusable="false" className={className} {...props}>
-      <defs>
-        <radialGradient id={gradientId} cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stopColor="#ebb700" stopOpacity="0.55" />
-          <stop offset="70%" stopColor="#ebb700" stopOpacity="0.12" />
-          <stop offset="100%" stopColor="#ebb700" stopOpacity="0" />
-        </radialGradient>
-      </defs>
-      <path d={paths} fill={`url(#${gradientId})`} />
-    </svg>
+    <div aria-hidden="true" className={className}>
+      <svg viewBox="0 0 200 200" focusable="false" className="block size-full" {...props}>
+        <defs>
+          <radialGradient id={gradientId} cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="#ebb700" stopOpacity="0.55" />
+            <stop offset="70%" stopColor="#ebb700" stopOpacity="0.12" />
+            <stop offset="100%" stopColor="#ebb700" stopOpacity="0" />
+          </radialGradient>
+        </defs>
+        <path d={paths} fill={`url(#${gradientId})`} />
+      </svg>
+    </div>
   );
 }
 

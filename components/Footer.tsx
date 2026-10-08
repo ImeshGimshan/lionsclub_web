@@ -19,7 +19,8 @@ const resources = [
   { href: lionsLinks.brandGuidelines, label: "Brand guidelines" },
 ];
 
-export async function Footer() {
+/** `base` prefixes the in-page links: "" on the homepage, "/" on other pages. */
+export async function Footer({ base = "" }: { base?: "" | "/" }) {
   const { club, home } = await getSiteData();
   return (
     <footer className="relative overflow-hidden bg-navy-900 pt-20 text-white">
@@ -55,7 +56,7 @@ export async function Footer() {
             {clubLinks.map((link) => (
               <li key={link.href}>
                 <a
-                  href={link.href}
+                  href={base + link.href}
                   data-enquiry={"enquiry" in link ? link.enquiry : undefined}
                   className="text-white/75 transition-colors hover:text-white"
                 >
@@ -83,8 +84,17 @@ export async function Footer() {
       <div className="container-x mt-16 flex flex-col gap-4 border-t border-white/10 py-6 text-sm text-white/55 sm:flex-row sm:items-center sm:justify-between">
         <p>
           © {new Date().getFullYear()} {club.name}
+          <span aria-hidden="true" className="mx-2">
+            ·
+          </span>
+          <a href="/privacy" className="underline-offset-4 hover:text-white hover:underline">
+            Privacy notice
+          </a>
         </p>
-        <a href="#home" className="inline-flex items-center gap-2 font-semibold text-white/75 hover:text-lions-yellow">
+        <a
+          href={base ? "#main" : "#home"}
+          className="inline-flex items-center gap-2 font-semibold text-white/75 hover:text-lions-yellow"
+        >
           Back to top
           <ArrowUp className="size-4" aria-hidden="true" />
         </a>
