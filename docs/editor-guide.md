@@ -12,14 +12,10 @@ Changes appear on the public website within a few seconds of pressing **Publish*
 
 ## The basics
 
-### Two areas in the Studio
+### What the Studio contains
 
-Use the switcher in the top-left corner:
-
-| Area | What it is for |
-| --- | --- |
-| **Website content** | Everything visitors see: club details, homepage wording, projects, photos, officers |
-| **Enquiries** | Messages sent through the website's form. Private: never shown on the website |
+Everything visitors see: club details, homepage wording, projects, photos and officers. Enquiries from
+the website don't come here; they arrive on WhatsApp (see [Handling enquiries](#handling-enquiries)).
 
 ### Drafts and Publish
 
@@ -83,6 +79,10 @@ photos. **Gallery position** controls the order (lower numbers first; projects a
 **Club settings → Contact tab.** The phone number is entered twice: once as it should look
 (`+94 76 564 6292`) and once as digits only for the call button (`+94765646292`).
 
+**WhatsApp number for enquiries** is where the website's enquiry form sends messages. Use `+`
+followed by digits, no spaces. **Change it whenever the secretary changes**, or new enquiries keep
+going to the old secretary's phone.
+
 ### Change the homepage wording
 
 **Homepage**, then choose a tab: Hero, Our club, Section headings, Get involved, Support, Ribbon & footer.
@@ -109,24 +109,25 @@ shared on Facebook or WhatsApp.
 
 ## Handling enquiries
 
-People can send a message from the **Get involved** section of the website. Each one arrives in the
-Studio. **There is no email alert**, so check regularly (agree who checks, and who covers when they are away).
+The form in the **Get involved** section opens WhatsApp on the visitor's phone or computer with a
+message ready to send to the **WhatsApp number for enquiries** (Club settings → Contact). When they
+press Send, it arrives as a normal WhatsApp chat, for example:
 
-1. Switch to **Enquiries** (top-left).
-2. Open **New**. Each enquiry shows the name, topic and date.
-3. Reply using the method the person chose (email or phone).
-4. Set **Status** to **Contacted**, fill in **Handled by**, and add a short factual note. Publish.
-5. When finished, set **Status** to **Closed**.
+> Hello Lions Club of Dummalasuriya,
+>
+> I'm Nimal from Kuliyapitiya. I'd like to ask about becoming a member.
+>
+> (Sent from the club website)
 
-**Privacy rules**
+Nothing is stored on the website or in the Studio. Reply in the same chat.
 
-- The person's own words cannot be edited. That is deliberate.
-- Only use their details to reply to this enquiry. Never add them to mailing lists or share them.
-- Enquiries must be deleted **12 months** after they arrive (the website promises this). Check
-  **Due for deletion** each month and delete everything listed there (menu → Delete).
-- If someone asks to see, correct or remove their details, the secretary handles it straight away.
+**Good practice**
 
-You can also log a phone or in-person enquiry yourself with **+ (Create)**, so all enquiries are in one place.
+- Reply within a few days, even if only to say when you'll have an answer.
+- Only use people's details to reply to their enquiry. Don't add them to groups or broadcast lists
+  without asking, and don't share their number.
+- If someone asks you to delete their messages, delete the chat.
+- When the secretary changes, update the WhatsApp number in the Studio on the same day.
 
 ---
 
@@ -137,7 +138,8 @@ These stay fixed in the website code and need the developer:
 - The Lions International mission, vision and "We Serve" motto (official, attributed wording)
 - The eight Lions global causes
 - The website menu and section order
-- The enquiry form's questions and privacy notice (they must match how the form actually works)
+- The enquiry form's topics and its "How your message is sent" notice (they must match how the form
+  actually works)
 - The Lions emblem, colours and fonts (Lions brand rules)
 
 ## Getting help

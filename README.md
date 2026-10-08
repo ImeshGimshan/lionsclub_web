@@ -16,7 +16,6 @@ Requirements: Node.js 22.12 or newer (Sanity Studio needs it; the site alone run
 ```bash
 # Website
 npm install
-cp .env.example .env.local      # then fill in SANITY_ENQUIRIES_WRITE_TOKEN (see docs/deployment.md)
 npm run dev                     # http://localhost:3000
 
 # Sanity Studio (content editing), in a second terminal
@@ -26,7 +25,7 @@ npm run dev                     # http://localhost:3333
 ```
 
 The site reads published content straight from the Sanity project `zhxlfgcp`, so it works without
-any local content setup. Only the enquiry form needs the token in `.env.local`.
+any local content setup or environment variables.
 
 ## Scripts
 
@@ -44,7 +43,6 @@ any local content setup. Only the enquiry form needs the token in `.env.local`.
 
 | Variable | Required | Purpose |
 | --- | --- | --- |
-| `SANITY_ENQUIRIES_WRITE_TOKEN` | Yes, for the enquiry form | Server-only Editor token that writes to the private `enquiries` dataset |
 | `NEXT_PUBLIC_SANITY_PROJECT_ID` | No (defaults to `zhxlfgcp`) | Sanity project |
 | `NEXT_PUBLIC_SANITY_DATASET` | No (defaults to `production`) | Public content dataset |
 | `SANITY_REVALIDATE_SECRET` | Only with the optional publish webhook | Verifies calls to `/api/revalidate` |
@@ -60,10 +58,10 @@ components/
   motion/               Smooth scrolling, scroll animations, providers
   ui/                   Shared pieces (headings, emblem, icons, links)
 lib/
-  sanity/               Sanity client, GROQ query, image helpers, enquiry write client
+  sanity/               Sanity client, GROQ query, image helpers
   site-data.ts          Fetches and shapes all page content
   content.ts            Fixed content kept in code (Lions links, global causes, menu)
-  enquiry.ts            Enquiry form fields and validation
+  enquiry.ts            Enquiry form fields, validation and the WhatsApp message
 public/images/          Official Lions emblem only (all photos live in Sanity)
 studio/                 Sanity Studio: schemas, desk structure and seed script (original photos are not committed)
 docs/                   Project documentation (below)
@@ -73,10 +71,10 @@ docs/                   Project documentation (below)
 
 | Document | For | Covers |
 | --- | --- | --- |
-| [docs/editor-guide.md](docs/editor-guide.md) | Club editors | Updating projects, photos, officers and wording in the Studio; handling enquiries |
+| [docs/editor-guide.md](docs/editor-guide.md) | Club editors | Updating projects, photos, officers and wording in the Studio; replying to WhatsApp enquiries |
 | [docs/architecture.md](docs/architecture.md) | Developers | How the site is built: data flow, caching, live updates, motion system |
 | [docs/content-model.md](docs/content-model.md) | Developers | Every Sanity document type and how it maps to the page |
-| [docs/enquiries.md](docs/enquiries.md) | Developers, club | Enquiry form: flow, privacy, spam protection, retention |
+| [docs/enquiries.md](docs/enquiries.md) | Developers, club | Enquiry form: WhatsApp flow, validation, privacy |
 | [docs/deployment.md](docs/deployment.md) | Developers | Deploying to Vercel, Studio hosting, domains, go-live checklist |
 | [docs/maintenance.md](docs/maintenance.md) | Developers | Backups, tokens, updates, testing, troubleshooting |
 | [docs/project-status.md](docs/project-status.md) | Everyone | Requirements coverage, open club decisions, remaining work |

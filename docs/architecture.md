@@ -4,18 +4,18 @@ A single-page Next.js site whose content lives in Sanity. Visitors get a cached,
 editors' changes refresh it within seconds.
 
 ```
-            ┌──────────────────────── Sanity (project zhxlfgcp) ───────────────────────┐
-            │  production dataset (public)          enquiries dataset (private)         │
-            │  settings, homepage, projects,        enquiry documents                   │
-            │  albums, officers, images                                                 │
-            └──────▲───────────────────▲──────────────────────────────▲────────────────┘
-       GROQ query  │      live events  │ (browser)        create (token)│
-                   │                   │                               │
-┌──────────────────┴───────────┐   ┌───┴──────────────────────┐   ┌────┴─────────────────────┐
-│ Next.js server               │   │ Visitor's browser         │   │ Server action            │
-│ app/page.tsx → getSiteData() │◄──│ SanityLiveRefresh         │   │ app/enquiry-actions.ts   │
-│ ISR, revalidate = 60 s       │   │ → refreshFromSanity()     │   │ (validate, spam checks)  │
-└──────────────────────────────┘   └───────────────────────────┘   └──────────────────────────┘
+            ┌──────────── Sanity (project zhxlfgcp) ────────────┐
+            │  production dataset (public)                       │
+            │  settings, homepage, projects, albums, officers,   │
+            │  images                                            │
+            └──────▲───────────────────▲─────────────────────────┘
+       GROQ query  │      live events  │ (browser)
+                   │                   │
+┌──────────────────┴───────────┐   ┌───┴──────────────────────┐        ┌──────────────────────┐
+│ Next.js server               │   │ Visitor's browser         │ wa.me  │ WhatsApp             │
+│ app/page.tsx → getSiteData() │◄──│ SanityLiveRefresh         │───────►│ club's enquiry number│
+│ ISR, revalidate = 60 s       │   │ EnquiryForm (no server)   │        │                      │
+└──────────────────────────────┘   └───────────────────────────┘        └──────────────────────┘
 ```
 
 ## Rendering and data
@@ -61,8 +61,9 @@ Live updates need each site origin in Sanity's **CORS origins** (no credentials)
 
 ## Enquiry form
 
-See [enquiries.md](enquiries.md). In short: client form → server action → validation and spam checks →
-`create` in the private `enquiries` dataset with a server-only token.
+See [enquiries.md](enquiries.md). In short: the form validates in the browser, builds a message and
+opens a `wa.me` link to the club's WhatsApp number. The website has no server code, storage or
+secrets for enquiries.
 
 ## Motion system
 
@@ -119,13 +120,7 @@ animations are cut to near zero. All content stays visible.
 
 ## Studio
 
-`studio/` is a standalone Sanity Studio with two workspaces:
-
-| Workspace | Path | Dataset |
-| --- | --- | --- |
-| Website content | `/website` | `production` |
-| Enquiries | `/enquiries` | `enquiries` (private) |
-
-Schemas are in `studio/schemaTypes/`; the desk structure for website content is `studio/structure.ts`
-and for enquiries `studio/schemaTypes/enquiries/structure.ts`. Details in
+`studio/` is a standalone Sanity Studio with one workspace, **Website content** (path `/website`,
+dataset `production`), hosted at <https://lions-dummalasuriya.sanity.studio>. Schemas are in
+`studio/schemaTypes/`; the desk structure is `studio/structure.ts`. Details in
 [content-model.md](content-model.md).

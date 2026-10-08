@@ -1,31 +1,45 @@
-# Enquiry form
+# Enquiry form (WhatsApp)
 
 Visitors send membership, volunteering, meeting, support and community enquiries from the
-**Get involved** section. Submissions are stored in Sanity for the secretary to follow up. There are
-no email notifications by design: the club checks the Studio.
+**Get involved** section. The form builds a message and opens WhatsApp with it, addressed to the
+club's number. The visitor presses Send in WhatsApp and the secretary replies in the same chat.
 
-This corresponds to the optional enquiry form in Section 08 of the requirements (decision D10). The
-club must approve the form and its privacy wording before launch.
+**The website receives and stores nothing.** There is no server code, database, token or email
+service behind the form.
+
+This is the optional enquiry form in Section 08 of the requirements (decision D10). It adds WhatsApp as
+a contact channel, which FR19 says needs the club's confirmation; see
+[project-status.md](project-status.md).
 
 ## Flow
 
 ```
-EnquiryForm.tsx (client)
-  └─ <form action={submitEnquiry}>
-       app/enquiry-actions.ts (server action)
-         1. read fields            lib/enquiry.ts → readEnquiry()
-         2. spam traps             honeypot field "website", minimum fill time 3 s
-         3. validate               lib/enquiry.ts → validateEnquiry()
-         4. rate limit             5 per IP per 10 minutes (per server instance)
-         5. create document        lib/sanity/enquiries.ts → private "enquiries" dataset
-       ◄─ EnquiryState: success | error (field errors + values to refill)
+components/sections/EnquiryForm.tsx (client)
+  1. visitor picks a topic, enters name, area (optional), message
+  2. validate               lib/enquiry.ts → validateEnquiry()
+  3. build message          lib/enquiry.ts → enquiryMessage()
+  4. open link              lib/enquiry.ts → whatsappUrl()  →  https://wa.me/<number>?text=…
+  5. show "Almost there"    with a "Try again" link to the same chat
 ```
 
+- `wa.me` opens the WhatsApp app on phones and WhatsApp Web or Desktop on computers.
+- The number comes from **Club settings → Contact → WhatsApp number for enquiries**
+  (`whatsappNumber`, required, `+` and digits). If it were ever empty the form is hidden and only the
+  call button shows.
 - Other buttons preselect the topic with `data-enquiry="volunteering"` (and `href="#enquiry"`). Arriving
   at `/#events` preselects "Visiting a meeting".
-- Bots that trip a spam trap get a normal-looking success and nothing is stored.
-- On a storage failure the visitor sees an error that offers the phone and email instead; the server
-  logs the error message only, never the person's details.
+
+Example message:
+
+```
+Hello Lions Club of Dummalasuriya,
+
+I'm Nimal from Kuliyapitiya. I'd like to ask about becoming a member.
+
+When is the next meeting?
+
+(Sent from the club website)
+```
 
 ## Fields and validation
 
@@ -33,51 +47,32 @@ EnquiryForm.tsx (client)
 | --- | --- |
 | Topic | One of: membership, volunteering, meeting, support, community, other |
 | Name | 2–100 characters |
-| Reply by | `email` or `phone`; only the chosen detail is stored |
-| Email | Basic address format, when email is chosen |
-| Phone | 9–15 digits after removing spaces, `+`, `-`, brackets |
 | Area | Optional, up to 100 characters |
-| Message | Optional, up to 2,000 characters; at least 10 characters for "community" and "other" |
-| Consent | Must confirm they read how details are used |
+| Message | Optional, up to 1,000 characters (keeps the link short); at least 10 characters for "community" and "other" |
 
-Labels, topics and the privacy notice are deliberately in code (`lib/enquiry.ts`,
-`components/sections/EnquiryForm.tsx`), because they must match how the form behaves. The card's
+No email, phone or consent fields: WhatsApp already gives the secretary the visitor's number, and the
+visitor decides whether to send.
+
+Labels, topics and the "How your message is sent" notice are in code (`lib/enquiry.ts`,
+`components/sections/EnquiryForm.tsx`) because they must match how the form behaves. The card's
 heading, intro and tick points are editable in **Homepage → Get involved**.
 
 ## Privacy
 
-- **Storage:** private dataset; anonymous API requests return nothing. Readable only by signed-in Studio
-  users and the server.
-- **Token:** `SANITY_ENQUIRIES_WRITE_TOKEN` is an Editor token used only on the server. It never reaches
-  the browser. Editor tokens can write to every dataset in the project, so treat it as a secret.
-- **Minimisation:** only one contact detail; no ID documents or dates of birth.
-- **Retention:** each enquiry gets `deleteAfter = submittedAt + 12 months` (`RETENTION_MONTHS` in
-  `lib/enquiry.ts`). The privacy notice states 12 months. If you change one, change the other.
-- **Deletion is manual:** the Studio's **Due for deletion** list shows expired enquiries; the club deletes
-  them. Automating this (for example a scheduled job) is possible future work.
-- **Accessibility:** labelled fields, error summary that receives focus and links to each field,
-  `aria-invalid` and `aria-describedby` on fields, values kept after an error, and an announced
-  success message.
-
-The site-wide privacy notice required by Section 13 still needs writing (see
-[project-status.md](project-status.md)). It must name Sanity.io and the hosting provider.
-
-## Studio workflow
-
-Enquiries workspace → **New** → reply → set **Contacted**, **Handled by**, notes → **Closed**. Full
-steps for the club are in the [editor guide](editor-guide.md#handling-enquiries).
-
-## Rotating the token
-
-```bash
-cd studio
-npx sanity tokens list                                   # find the old token's id
-npx sanity tokens add "Website enquiry form (server only)" --role=editor
-# put the new value in .env.local and the host's environment variables, redeploy, then:
-npx sanity tokens delete <old-token-id> --yes
-```
+- Nothing typed in the form leaves the visitor's device until they press Send in WhatsApp.
+- Once sent, the message, name and WhatsApp number are in the secretary's WhatsApp, a service run by
+  Meta. The site-wide privacy page must say so.
+- Messages stay with whoever holds the number. When the secretary changes, update the number in the
+  Studio; past chats stay on the previous secretary's phone, so the club should agree how those are
+  handed over or deleted.
+- Accessibility: labelled fields, an error summary that receives focus and links to each field,
+  `aria-invalid` and `aria-describedby`, and the confirmation heading receives focus.
 
 ## Testing it
 
-Submit a clearly labelled test enquiry, confirm it appears under **New**, then delete it. Also check
-that an empty submit shows the error summary, and that `/#enquiry` lands on the form.
+After each deploy, on a phone and on a computer:
+
+- [ ] An empty submit shows the error summary
+- [ ] A valid submit opens WhatsApp with the message ready, addressed to the club number
+- [ ] Sending it reaches the secretary (send one clearly marked test, then delete the chat)
+- [ ] `/#events` lands on the form with "Visiting a meeting" selected

@@ -27,10 +27,10 @@ git push -u origin main
 
 The repository can be public. Nothing secret or personal is committed:
 
-- `.env.local` (the enquiry token) is git-ignored.
+- `.env.local` is git-ignored.
 - The original club photos (`studio/seed/images/`) are git-ignored because they show identifiable
   people. The site doesn't need them: every photo it shows is served from Sanity.
-- Enquiries live in the private Sanity dataset, never in the code.
+- Enquiries go straight to WhatsApp and are never stored by the site.
 
 Before every push, check that `git status` lists no `.env` file and no photos.
 
@@ -39,12 +39,8 @@ Before every push, check that `git status` lists no `.env` file and no photos.
 1. vercel.com → **Add New → Project** → import the repository.
 2. Framework: **Next.js** (detected). Root directory: the repository root. Leave the build settings at
    their defaults. The `studio/` folder isn't part of the website build.
-3. **Environment variables** (Settings → Environment Variables, for Production and Preview):
-
-   | Name | Value |
-   | --- | --- |
-   | `SANITY_ENQUIRIES_WRITE_TOKEN` | Copy from your `.env.local` (required for the form) |
-   | `SANITY_REVALIDATE_SECRET` | Only if you set up the webhook in step 6 |
+3. **Environment variables:** none are required. Add `SANITY_REVALIDATE_SECRET` (Settings →
+   Environment Variables) only if you set up the webhook in step 6.
 
 4. **Deploy.** You get an address such as `https://<project>.vercel.app`.
 
@@ -75,8 +71,23 @@ Hosted Studios on `*.sanity.studio` are allowed automatically; no CORS step need
 
 ## 5. Custom domain
 
-When the club decides the domain (D07): Vercel → Project → **Settings → Domains** → add it and follow
-the DNS instructions. Then add the domain to Sanity CORS (step 3).
+The site's domain is **lionsclubofdummalasuriya.org**, registered at Namecheap, with DNS kept on
+Namecheap (BasicDNS nameservers).
+
+| Namecheap → Advanced DNS | Host | Value |
+| --- | --- | --- |
+| A Record | `@` | the IP shown in Vercel → Settings → Domains (currently `216.198.79.1`) |
+| CNAME Record | `www` | the CNAME shown in Vercel for `www` |
+
+Namecheap's default parking records (CNAME `www` → parkingpage, URL Redirect `@`) must be deleted.
+
+In Vercel → **Settings → Domains**, `lionsclubofdummalasuriya.org` serves the site and
+`www.lionsclubofdummalasuriya.org` should **redirect** to it (308). Both, plus `www`, are in Sanity
+CORS. The official address is set in `siteUrl` (`lib/content.ts`); it drives the canonical URL and
+link previews, so update it if the domain ever changes.
+
+Keep **Auto-Renew** on in Namecheap. At handover, transfer the domain to a Namecheap account the club
+owns.
 
 ## 6. Optional: publish webhook
 
@@ -94,12 +105,12 @@ nobody does:
 ## Go-live checklist
 
 - [ ] Club approvals received (see [project-status.md](project-status.md))
-- [ ] `SANITY_ENQUIRIES_WRITE_TOKEN` set in Vercel; a test enquiry arrives in the Studio and is deleted
+- [ ] Club confirmed the WhatsApp number in Club settings; a test enquiry opens WhatsApp addressed to it
 - [ ] Production domain added to Sanity CORS; publishing a small change shows on the open site within seconds
 - [ ] Studio deployed; secretary and a backup editor invited and able to sign in
 - [ ] Site-wide privacy page published
 - [ ] In `app/layout.tsx`, remove `robots: { index: false, follow: false }`
-- [ ] Set `metadataBase` to the production URL; add `app/sitemap.ts` and `app/robots.ts`
+- [ ] Add `app/sitemap.ts` and `app/robots.ts` (`metadataBase` and the canonical URL are already set)
 - [ ] Share the URL on Facebook/WhatsApp to check the preview image and text
 - [ ] Run the checks in [maintenance.md](maintenance.md#release-checks) on the live URL
 - [ ] Take the first backup ([maintenance.md](maintenance.md#backups))

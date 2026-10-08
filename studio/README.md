@@ -1,11 +1,10 @@
 # Sanity Studio — Lions Club of Dummalasuriya
 
-Content editing for the club website. Project `zhxlfgcp`, two workspaces:
+Content editing for the club website. Project `zhxlfgcp`, one workspace:
 
 | Workspace | URL path | Dataset | Contents |
 | --- | --- | --- | --- |
 | Website content | `/website` | `production` (public) | Club settings, homepage wording, projects, albums, officers |
-| Enquiries | `/enquiries` | `enquiries` (private) | Enquiry form submissions |
 
 ```bash
 npm install
@@ -20,7 +19,6 @@ npm run deploy    # publish to https://lions-dummalasuriya.sanity.studio
 | `structure.ts` | Desk structure for website content |
 | `schemaTypes/documents/` | `siteSettings`, `homepage`, `project`, `album`, `officer` |
 | `schemaTypes/objects/` | `photo`, `activity`, `sectionHeading` |
-| `schemaTypes/enquiries/` | `enquiry` schema and its desk structure |
 | `seed/` | The script that created the initial content. It reads the original photos from `seed/images/club/`, which is git-ignored; get them from the club's shared drive |
 
 **`npm run seed` replaces the seeded documents in `production`** and wipes editors' changes to them.

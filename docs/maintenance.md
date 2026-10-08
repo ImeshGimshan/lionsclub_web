@@ -7,14 +7,14 @@ schedule, for example monthly (requirements Sections 11, 13 and AT10).
 
 ```bash
 cd studio
-npx sanity datasets export production  ../backups/production-$(date +%F).tar.gz
-npx sanity datasets export enquiries   ../backups/enquiries-$(date +%F).tar.gz
+npx sanity datasets export production ../backups/production-$(date +%F).tar.gz
 ```
 
-- `backups/` is git-ignored. Store the files somewhere the club controls.
-- **The enquiries export contains personal data.** Keep it encrypted or access-restricted, and delete
-  copies older than 12 months, in line with the privacy notice.
-- The production export includes all images, so it is a complete restore point.
+- `backups/` is git-ignored. Store the files somewhere the club controls, such as the club's Google
+  Drive next to the original photos.
+- The export includes all images, so it is a complete restore point.
+- On Sanity's free plan the Studio's History only reaches back a few days, so these exports are the
+  real safety net.
 
 ### Restore (and test the restore)
 
@@ -44,9 +44,9 @@ instead (see [content-model.md](content-model.md#adding-a-field)).
 
 | Item | Where | Rotate when |
 | --- | --- | --- |
-| Enquiry write token | `.env.local`, Vercel env vars | Someone with access leaves, or it may have leaked. Steps in [enquiries.md](enquiries.md#rotating-the-token). |
 | Webhook secret (optional) | Vercel env var + Sanity webhook | Same |
-| Studio members | sanity.io/manage → Members | Officers change each service year: remove people who no longer edit |
+| Studio members | sanity.io/manage → Members | Officers change each service year: remove people who no longer edit. On the free plan editors must be **Administrators** (the only other role, Viewer, can't edit) |
+| WhatsApp number for enquiries | Studio → Club settings → Contact | The secretary changes |
 
 Never put secrets in the repository, the requirements document or chat messages.
 
@@ -68,7 +68,7 @@ Before each deploy to production:
 
 ```bash
 npx tsc --noEmit && npm run lint && npm run build
-cd studio && npx sanity schema validate --workspace website && npx sanity schema validate --workspace enquiries
+cd studio && npx sanity schema validate
 ```
 
 Then in a browser (desktop and phone width):
@@ -76,8 +76,8 @@ Then in a browser (desktop and phone width):
 - [ ] Menu links scroll to each section and clear the sticky header; the mobile menu opens, closes with
       Escape and returns focus
 - [ ] Every gallery album opens; arrow keys, Escape, thumbnails and swipe work; photos are uncropped
-- [ ] The enquiry form shows errors on an empty submit, and a test enquiry arrives in the Studio
-      (then delete it)
+- [ ] The enquiry form shows errors on an empty submit, and a valid one opens WhatsApp with the
+      message addressed to the club number
 - [ ] `/#enquiry` and `/#events` land on the form
 - [ ] Publishing a small change in the Studio appears on the open site within a few seconds
 - [ ] With the OS "reduce motion" setting on, everything is visible and nothing animates
@@ -93,7 +93,8 @@ a test suite is listed in [project-status.md](project-status.md).
 | --- | --- | --- |
 | Build fails: "Club settings" or "Homepage" document is missing | The singleton was unpublished or deleted | Publish it in the Studio |
 | Edits don't appear | Not published, or the site origin isn't in Sanity CORS (falls back to a 1-minute refresh) | Press Publish; add the origin with `npx sanity cors add` |
-| Form says "couldn't send" | `SANITY_ENQUIRIES_WRITE_TOKEN` missing or revoked | Set or rotate the token, then redeploy |
+| Enquiries go to the wrong person | WhatsApp number not updated after a change of secretary | Update Club settings → Contact → WhatsApp number |
+| Enquiry form missing (only the call button shows) | WhatsApp number is empty | Fill it in and publish |
 | A photo looks badly cropped | The hotspot or crop in the Studio | Open the photo in the Studio and adjust the hotspot |
 | New Tailwind classes have no effect | The class name was built at runtime | Write class names out in full in the source |
 | Section animates oddly or gets stuck | A CSS `transition` on `transform` conflicting with GSAP | Use `transition-[translate]` or remove the transition |

@@ -3,10 +3,10 @@
 Project `zhxlfgcp`. Schemas live in `studio/schemaTypes/`. The website reads them through one GROQ
 query in `lib/sanity/queries.ts`, shaped by `lib/site-data.ts`.
 
-| Dataset | Visibility | Contents |
-| --- | --- | --- |
-| `production` | Public (read without a token) | Everything shown on the website |
-| `enquiries` | Private | Enquiry form submissions |
+One dataset, `production`, public (read without a token). It holds everything shown on the website
+and nothing else: enquiries go to WhatsApp and are never stored in Sanity. The free plan only allows
+public datasets, so **never add personal data** (enquiries, member lists, contact details of
+beneficiaries) to Sanity.
 
 ## Singletons
 
@@ -15,7 +15,7 @@ query in `lib/sanity/queries.ts`, shaped by `lib/site-data.ts`.
 | Tab | Fields | Used for |
 | --- | --- | --- |
 | Club | `clubName`, `district`, `multipleDistrict`, `locality`, `serviceYear` (`2026/27` format), `localWording` | Header, hero eyebrow, About, Officers year badge, motto card. The country shown in the header is the last part of `locality`. |
-| Contact | `secretaryName`, `secretaryRole`, `email`, `phoneDisplay`, `phoneInternational` (`+digits`), `facebook` | Contact card, call/email links, privacy notice |
+| Contact | `secretaryName`, `secretaryRole`, `email`, `phoneDisplay`, `phoneInternational` (`+digits`), `whatsappNumber` (`+digits`, required), `facebook` | Contact card, call/email links, the number the enquiry form opens in WhatsApp |
 | Homepage | `heroPhoto` (required), `aboutPhotos` (max 2), `impactPeriod`, `impactItems` (max 3 × `{value, label}`), `impactNote` (optional, ≤ 160) | Hero photo and caption, Our club photo band, impact tiles and the note under them (hidden when empty) |
 | Search & sharing | `seoTitle`, `seoDescription`, `shareImage` | `<title>`, meta description, Open Graph/Twitter image (falls back to the hero photo, cropped to 1200 × 630) |
 
@@ -87,18 +87,6 @@ The site requests `asset`, `crop`, `hotspot`, `alt`, `caption` and the asset's `
 ### Section heading — `sectionHeading`
 
 `eyebrow` (≤ 60), `title` (≤ 90, supports `*accent*`), `intro` (≤ 240).
-
-## Enquiries dataset
-
-### Enquiry — `enquiry`
-
-| Group | Fields |
-| --- | --- |
-| Handling | `status` (`new` / `contacted` / `closed`), `handledBy`, `notes` |
-| Submission | `category`, `name`, `replyMethod`, `email` or `phone`, `area`, `message`, `submittedAt`, `deleteAfter`, `source` (`website` / `manual`) |
-
-Submission fields are read-only when `source == "website"`. Desk lists: New, Contacted, Closed, Due for
-deletion (`deleteAfter < now()`), All. See [enquiries.md](enquiries.md).
 
 ## Adding a field
 
