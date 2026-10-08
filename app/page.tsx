@@ -13,6 +13,7 @@ import { Join } from "@/components/sections/Join";
 import { Officers } from "@/components/sections/Officers";
 import { Projects } from "@/components/sections/Projects";
 import { Support } from "@/components/sections/Support";
+import { siteUrl } from "@/lib/content";
 import { getSiteData } from "@/lib/site-data";
 
 // Publishing in Sanity refreshes open tabs immediately via <SanityLiveRefresh /> (and via
@@ -21,9 +22,33 @@ import { getSiteData } from "@/lib/site-data";
 export const revalidate = 60;
 
 export default async function Home() {
-  const { club, albums, officers, home } = await getSiteData();
+  const { club, albums, officers, home, seo } = await getSiteData();
+  // Structured data for search engines, limited to facts shown on the page (requirements SEO03).
+  const [locality] = club.locality.split(",");
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "NGO",
+    name: club.name,
+    url: siteUrl,
+    logo: `${siteUrl}/icons/icon-512.png`,
+    image: seo.image,
+    description: seo.description,
+    email: club.email,
+    telephone: club.phoneHref.replace(/^tel:/, ""),
+    address: { "@type": "PostalAddress", addressLocality: locality.trim(), addressCountry: club.country },
+    sameAs: [club.facebook],
+    parentOrganization: {
+      "@type": "Organization",
+      name: "Lions Clubs International",
+      url: "https://www.lionsclubs.org",
+    },
+  };
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
+      />
       <Header clubName={club.name} tagline={[club.district.replace(/^Lions\s+/i, ""), club.country].join(" · ")} />
       <main id="main" tabIndex={-1} className="outline-none">
         <Hero />
