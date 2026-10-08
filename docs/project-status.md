@@ -79,10 +79,10 @@ roles, so every editor is an Administrator and the club's review step is a proce
 | ID | Requirement | Status | Notes |
 | --- | --- | --- | --- |
 | SEO01 | Metadata | Done | Title and description editable in Club settings → Search & sharing |
-| SEO02 | Discoverability | Partly done | Canonical URL and `metadataBase` set to lionsclubofdummalasuriya.org. Still to do at launch: `robots.ts`, `sitemap.ts`, remove `noindex` |
+| SEO02 | Discoverability | Ready | Canonical URLs, `robots.txt` and `sitemap.xml` (home and privacy) in place. At launch set `searchIndexing = true` in `lib/content.ts`, which removes `noindex` and advertises the sitemap |
 | SEO03 | Sharing | Partly done | Open Graph and Twitter images from the hero photo (1200 × 630). Test on the final URL |
 | — | Analytics | Not commissioned | None installed (D10) |
-| — | Privacy notice | Partly done | The form explains how messages are sent. A site-wide privacy page naming the host, Sanity and WhatsApp is still needed |
+| — | Privacy notice | Club | `/privacy` written from what the site actually does (checked: no cookies or browser storage; the browser contacts only Vercel and Sanity's live API). Names Vercel, Sanity and WhatsApp. Linked from the footer and the form. Club to approve the wording |
 | — | Form security | Done | No server endpoint, storage or secrets: the form only builds a WhatsApp link, so there is nothing to attack or leak |
 | — | Backups | Partly done | Procedure documented and tested manually; not yet scheduled |
 
@@ -96,8 +96,8 @@ roles, so every editor is an Administrator and the club's review step is a proce
 | AT04 | Navigation | Done | Automated browser checks (anchor offsets, menu focus) |
 | AT05 | Gallery | Done | Automated browser checks (all albums, keys, thumbnails, single photo) |
 | AT06 | Contact and support | Done | Link targets checked; wording reviewed |
-| AT07 | Responsive and accessible | Partly done | Tested in Edge at 360–1900 px and with reduced motion. Still to do: other browsers, real phones, 200% zoom, screen reader |
-| AT08 | Speed and search | To do | Lighthouse and Core Web Vitals report; SEO02 |
+| AT07 | Responsive and accessible | Partly done | Edge at 360–1900 px and with reduced motion; axe (WCAG 2.2 AA + best practice) on home, privacy and 404 at desktop and phone width: no violations except two transient scroll-effect states (see note below). Still to do: other browsers, real phones, 200% zoom, screen reader |
+| AT08 | Speed and search | Partly done | Lighthouse 13 (9 Oct 2026), see below. CLS 0. Field data (Core Web Vitals) only after launch, once there is traffic |
 | AT09 | Optional features | Partly done | WhatsApp form: validation, message content, number, focus and mobile layout tested automatically. Real send to the club number to test on a phone |
 | AT10 | Release and recovery | To do | First production deploy, rollback demonstration, restore test record |
 
@@ -127,15 +127,44 @@ roles, so every editor is an Administrator and the club's review step is a proce
   resource hub.
 - Domain, hosting plan and account ownership (D07).
 
+## Audit results (9 October 2026)
+
+Lighthouse 13, homepage, with Lighthouse's simulated throttling:
+
+| Run | Performance | Accessibility | Best practices | LCP | CLS | TBT |
+| --- | --- | --- | --- | --- | --- | --- |
+| Desktop, live site | 99 | 92 → 96 after fixes | 100 | 1.0 s | 0 | 60 ms |
+| Mobile, live site | 65 | 92 → 96 after fixes | 100 | 5.3 s | 0 | 340 ms |
+| Mobile, local production build | 77–82 | 96 | — | 4.0–4.6 s | 0 | 190–350 ms |
+
+The SEO score (66) only reflects the deliberate `noindex` before launch.
+
+Fixed after the audit:
+
+- Album cards and the header logo link: visible text is now part of the accessible name (WCAG 2.5.3).
+- The scroll-highlighted "Our club" statement no longer puts `aria-label` on a `<p>`.
+- "Our club" pillar numbers changed from yellow to Lions blue (yellow on white was 1.85:1).
+- The ribbon animation pauses while off screen; the sunburst rotates a wrapper `<div>`, not the SVG.
+
+Recorded, not changed (decorative scroll effects):
+
+- The "Our club" statement's words start pale and brighten as they scroll into reading position, and
+  the hero copy fades as it scrolls away. Automated tools flag both in their in-between states; at the
+  point a visitor reads them, contrast is full. With "reduce motion" on, neither effect runs.
+- Mobile LCP is held back mainly by the amount of animation JavaScript (GSAP, Lenis, Motion) on slow
+  phones; the hero photo itself loads in about 0.2 s. Reducing it further means deferring the
+  animation system, which risks a flash of content and was not done.
+
 ## Remaining work
 
 Before launch:
 
-- [ ] Site-wide privacy page (hosting, Sanity, WhatsApp enquiries, removal requests)
-- [ ] SEO02: `app/sitemap.ts`, `app/robots.ts`; remove `noindex`
-- [ ] Branded 404 page and proper favicon / app icons (currently the emblem PNG)
+- [x] Site-wide privacy page (club to approve the wording)
+- [x] SEO02 prepared: switch on with `searchIndexing` at launch
+- [x] Branded 404 page; favicon, app icons and web manifest
+- [x] Lighthouse and axe audit; fixes applied (see below)
 - [ ] Move the Playwright browser checks into the repository as a test suite
-- [ ] Performance and accessibility audit (Lighthouse, axe, contrast, keyboard, screen reader)
+- [ ] Manual accessibility checks: keyboard-only pass, 200% zoom, a screen reader (NVDA or VoiceOver)
 - [ ] Cross-browser and device testing (Chrome, Firefox, Safari/iOS, Android)
 - [ ] First deploy following [deployment.md](deployment.md), then the go-live checklist
 

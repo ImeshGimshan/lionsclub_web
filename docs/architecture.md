@@ -20,9 +20,15 @@ editors' changes refresh it within seconds.
 
 ## Rendering and data
 
-- **One route**, `app/page.tsx`, composed of section components in `components/sections/`. Section
-  order follows the sitemap in the requirements (Home, Our club, Projects, Gallery, Officers, Get
-  involved, Support, Contact). Anchors such as `#about`, `#projects` and `#events` are stable.
+- **The homepage**, `app/page.tsx`, is composed of section components in `components/sections/`.
+  Section order follows the sitemap in the requirements (Home, Our club, Projects, Gallery, Officers,
+  Get involved, Support, Contact). Anchors such as `#about`, `#projects` and `#events` are stable.
+- **Other routes:** `app/privacy/page.tsx` (privacy notice), `app/not-found.tsx` (branded 404),
+  and the metadata files `robots.ts`, `sitemap.ts`, `manifest.ts`, `favicon.ico`, `icon.png` and
+  `apple-icon.png` (home-screen icons are in `public/icons/`). `Header` and `Footer` take
+  `base="/"` on pages other than the homepage, so their section links lead back to `/#about` etc.
+- **Launch switch:** `searchIndexing` in `lib/content.ts` controls `noindex` on every page and
+  whether `robots.txt` lists the sitemap. `siteUrl` there is the canonical address.
 - **`lib/site-data.ts`** runs one GROQ query (`lib/sanity/queries.ts`) and maps the result into the
   view models in `lib/types.ts`. It is wrapped in React `cache()`, so every server component can call
   `getSiteData()` and only one request is made per render.
@@ -100,6 +106,11 @@ Rules learned the hard way:
   its white background doesn't cover the hero.
 - **Tailwind only generates classes written out in full.** Never assemble class names at runtime
   (the cause panels use a `cause-open:` custom variant defined in `app/globals.css` instead).
+- **Keep endless animations cheap.** The ribbon pauses while off screen (ScrollTrigger `onToggle`),
+  and `Sunburst` spins a wrapper `<div>` rather than the `<svg>`, which the GPU can rotate without
+  repainting.
+- **SplitText and ARIA.** On non-heading elements use `aria: "hidden"`; the default puts an
+  `aria-label` on the element, which is not allowed on a `<p>`.
 
 **Reduced motion:** with `prefers-reduced-motion: reduce`, GSAP animations are skipped (`gsap.matchMedia`),
 Lenis is not started, Motion follows the setting (`MotionConfig reducedMotion="user"`), and CSS

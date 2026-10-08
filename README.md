@@ -52,7 +52,8 @@ Never commit `.env.local`; it is git-ignored.
 ## Project layout
 
 ```
-app/                    Next.js routes: page, layout + metadata, server actions, /api/revalidate
+app/                    Routes: homepage, /privacy, 404, layout + metadata, robots, sitemap, manifest,
+                        icons, server actions, /api/revalidate
 components/
   sections/             One component per page section (Hero, About, Projects, Gallery, …)
   motion/               Smooth scrolling, scroll animations, providers
@@ -63,6 +64,7 @@ lib/
   content.ts            Fixed content kept in code (Lions links, global causes, menu)
   enquiry.ts            Enquiry form fields, validation and the WhatsApp message
 public/images/          Official Lions emblem only (all photos live in Sanity)
+public/icons/           Home-screen icons generated from the emblem
 studio/                 Sanity Studio: schemas, desk structure and seed script (original photos are not committed)
 docs/                   Project documentation (below)
 ```

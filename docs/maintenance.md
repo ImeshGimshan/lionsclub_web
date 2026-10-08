@@ -82,6 +82,8 @@ Then in a browser (desktop and phone width):
 - [ ] Publishing a small change in the Studio appears on the open site within a few seconds
 - [ ] With the OS "reduce motion" setting on, everything is visible and nothing animates
 - [ ] Phone, email and Facebook links go to the right places
+- [ ] `/privacy` loads and its links lead back to the homepage sections; an unknown URL shows the
+      branded 404 page
 - [ ] No horizontal scrolling at 360px width
 
 The browser checks were automated with Playwright during development. Adding them to the repository as

@@ -108,9 +108,10 @@ nobody does:
 - [ ] Club confirmed the WhatsApp number in Club settings; a test enquiry opens WhatsApp addressed to it
 - [ ] Production domain added to Sanity CORS; publishing a small change shows on the open site within seconds
 - [ ] Studio deployed; secretary and a backup editor invited and able to sign in
-- [ ] Site-wide privacy page published
-- [ ] In `app/layout.tsx`, remove `robots: { index: false, follow: false }`
-- [ ] Add `app/sitemap.ts` and `app/robots.ts` (`metadataBase` and the canonical URL are already set)
+- [ ] Club approved the privacy notice at `/privacy`
+- [ ] In `lib/content.ts`, set `searchIndexing = true` (removes `noindex` and lists the sitemap in
+      `robots.txt`); push and check `https://lionsclubofdummalasuriya.org/robots.txt`
+- [ ] Add the site to Google Search Console and submit `https://lionsclubofdummalasuriya.org/sitemap.xml`
 - [ ] Share the URL on Facebook/WhatsApp to check the preview image and text
 - [ ] Run the checks in [maintenance.md](maintenance.md#release-checks) on the live URL
 - [ ] Take the first backup ([maintenance.md](maintenance.md#backups))

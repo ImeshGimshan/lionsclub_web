@@ -140,6 +140,7 @@ These stay fixed in the website code and need the developer:
 - The website menu and section order
 - The enquiry form's topics and its "How your message is sent" notice (they must match how the form
   actually works)
+- The privacy notice at `/privacy` (its contact details update automatically from Club settings)
 - The Lions emblem, colours and fonts (Lions brand rules)
 
 ## Getting help
